@@ -78,7 +78,7 @@ export function About() {
             <div className="mt-8 p-6 bg-[#FFF5EB] rounded-xl border-l-4 border-[#C45500]">
               <p className="text-[#3D1C00]">
                 Quattordici capitoli organizzati in <strong>tre blocchi tematici</strong>
-                (linguaggio e strumenti, logica e dimostrazioni, matematica discreta),
+                {' '}(linguaggio e strumenti, logica e dimostrazioni, matematica discreta),
                 con esempi svolti, note per informatici che collegano la teoria alla pratica
                 professionale e appendici su come studiare la matematica con l'AI.
               </p>
