@@ -1,0 +1,67 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'postcss.config.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+# Un deploy alla volta: se ne parte un secondo mentre il primo e' attivo, attende
+concurrency:
+  group: deploy-ftp
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # SFTP implicit FTPS (porta 990) verso l'account Aruba del webspace loz.it.
+      # Credenziali da GitHub Secrets: FTP_USERNAME e FTP_PASSWORD.
+      # L'azione mantiene .ftp-deploy-sync-state.json sul server per sync incrementale
+      # (upload solo file cambiati + cancellazione file rimossi).
+      - name: Deploy to Aruba via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.loz.it
+          port: 990
+          protocol: ftps-legacy
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: /www.loz.it/
+          # Log a 'minimal' per non spammare; cambia in 'standard' o 'verbose' per debug
+          log-level: minimal
+          # Security: niente exclude di default; .ftp-deploy-sync-state.json si autogestisce
+
+      - name: Reminder HiSpeed Cache
+        run: |
+          echo "::notice::Deploy completato. Se vedi contenuto stale su www.loz.it o matematica.lornova.it, purga dal pannello Aruba: Velocita' -> HiSpeed Cache -> Purge."
