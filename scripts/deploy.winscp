@@ -1,0 +1,15 @@
+# WinSCP script: sincronizza dist/ sul webspace loz.it.
+# Invocato da scripts/deploy.ps1 via "WinSCP.com /script=...".
+# La sessione "ftp.loz.it" deve essere pre-configurata in WinSCP (host, user, password o chiave).
+
+option batch abort
+option confirm off
+
+open "D:\Progetti\lornova.it\matematica/ftp.loz.it"
+
+# Mirror: file nuovi/cambiati vengono caricati, file rimossi localmente vengono rimossi dal remoto.
+# Source-of-truth = dist/ locale. Se un file non e' in dist/, viene eliminato dal server.
+# %1% = path assoluto di dist/, passato da deploy.ps1 via /parameter (evita ambiguita' di cwd).
+synchronize remote -mirror "%1%" /www.loz.it/
+
+exit

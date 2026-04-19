@@ -1,0 +1,58 @@
+# Fallback SPA: ogni rotta non-file torna a index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Forza HTTPS (attivare dopo aver abilitato SSL sul pannello Aruba)
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} off
+#   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# Compressione
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/xml image/svg+xml text/plain
+</IfModule>
+
+# Cache: asset con hash = immutabili per 1 anno; HTML sempre rivalidato
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|woff|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Sicurezza base
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  # Nota: X-Frame-Options rimosso perche' incompatibile con il mascheramento
+  # iframe di matematica.lornova.it -> www.loz.it. Al suo posto usiamo CSP
+  # frame-ancestors che permette solo 'self' e lornova.it (blocca il resto).
+  Header set Content-Security-Policy "frame-ancestors 'self' https://lornova.it https://www.lornova.it https://matematica.lornova.it"
+</IfModule>
+
+# MIME types per i font moderni (se Aruba non li riconosce)
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+</IfModule>
