@@ -105,12 +105,13 @@ export function Contents() {
     {
       title: "Teoria degli insiemi",
       topics: [
-        "Insiemi e operazioni fondamentali: unione, intersezione, complemento",
+        "Operazioni fondamentali: unione, intersezione, complemento",
         "Proprietà delle operazioni insiemistiche",
         "Insieme delle parti e prodotto cartesiano",
         "Famiglie di insiemi e partizioni",
         "Insiemi numerici: \u2115, \u2124, \u211A, \u211D, \u2102",
-        "Cenni di cardinalità: insiemi numerabili e non numerabili"
+        "I numeri complessi: piano di Gauss, modulo, forma polare",
+        "Cardinalità: insiemi numerabili e diagonalizzazione di Cantor"
       ]
     },
     {
