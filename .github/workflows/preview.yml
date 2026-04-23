@@ -1,0 +1,87 @@
+name: Preview deploy (GitHub Pages)
+
+# Pubblica una preview del sito su GitHub Pages ad ogni push su un branch
+# diverso da main. Il deploy di produzione verso Aruba resta gestito da
+# deploy.yml e si attiva solo su main.
+#
+# Setup una tantum: repo Settings -> Pages -> Source: "GitHub Actions".
+#
+# L'URL della preview viene pubblicato nel summary del run e nell'environment
+# "github-pages". Ogni push sovrascrive la preview precedente (un solo slot).
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'postcss.config.mjs'
+      - '.github/workflows/preview.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: preview-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # La preview non deve essere indicizzata dai motori di ricerca:
+      # sovrascrive il robots.txt ereditato da public/ (che punta a
+      # matematica.lornova.it, sbagliato su Pages).
+      - name: Block indexing on preview
+        run: |
+          printf 'User-agent: *\nDisallow: /\n' > dist/robots.txt
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "### Preview pubblicata" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Branch: \`${{ github.ref_name }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
