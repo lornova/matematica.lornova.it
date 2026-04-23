@@ -23,6 +23,7 @@ export function Download() {
           </h2>
           <p className="text-xl text-white/90 mb-12">
             Disponibile al momento della pubblicazione su Amazon in formato cartaceo e Kindle.
+            Il formato Kindle, al momento, è una replica in PDF dell'edizione cartacea.
             Un percorso organico per costruire le basi matematiche del corso di laurea
             in Informatica L-31.
           </p>
@@ -76,7 +77,7 @@ export function Download() {
           </button>
 
           <p className="mt-6 text-sm text-white/80">
-            Formato cartaceo e Kindle. Uscita prevista nel 2026.
+            Formato cartaceo e Kindle (replica in PDF). In uscita a giugno 2026.
           </p>
         </div>
       </div>

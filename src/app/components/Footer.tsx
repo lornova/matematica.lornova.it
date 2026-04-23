@@ -14,7 +14,7 @@ export function Footer() {
             </div>
             <p className="text-gray-400 mb-4 text-sm">
               Manuale di matematica per studenti italiani di Informatica L-31.
-              Parte I del <em>Compendio di matematica per informatica</em>, in preparazione.
+              In uscita a giugno 2026.
             </p>
           </div>
 
@@ -44,6 +44,9 @@ export function Footer() {
               </li>
               <li>
                 <a href="#download" className="hover:text-[#E86A10] transition-colors">Acquista</a>
+              </li>
+              <li>
+                <a href="#errata" className="hover:text-[#E86A10] transition-colors">Errata</a>
               </li>
             </ul>
           </div>

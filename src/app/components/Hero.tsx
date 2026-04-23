@@ -16,7 +16,7 @@ export function Hero() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 bg-[#E86A10]/10 text-[#C45500] px-4 py-2 rounded-full text-sm border border-[#E86A10]/30">
               <BookOpen className="w-4 h-4" />
-              <span>In preparazione. Uscita prevista nel 2026.</span>
+              <span>In preparazione. In uscita a giugno 2026.</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3D1C00] leading-tight">
