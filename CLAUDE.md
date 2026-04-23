@@ -40,13 +40,16 @@ No test suite, no linter configured. TypeScript is checked only implicitly by Vi
 
 ## Architecture
 
-Single-page React SPA with **no router, no data fetching, no state management**. The only interactivity is smooth scroll between anchor sections and one accordion in `Contents.tsx`.
+Multi-page Vite build with **no router, no global state management**. Navigation between distinct "pages" uses real HTML entries (one Vite entry per page) rather than client-side routing, because iframe masking prevents outer-URL updates anyway.
 
-```
-src/main.tsx → src/app/App.tsx → 7 flat section components
-```
+Two entry points, declared under `build.rollupOptions.input` in `vite.config.ts`:
 
-Each section is a self-contained file in `src/app/components/` (`Header`, `Hero`, `About`, `Contents`, `Author`, `Download`, `Footer`) with hardcoded Italian copy. `ImageWithFallback` (under `components/figma/`) is a legacy helper from Figma Make, preserved for the two remote Unsplash images in `About` and `Author`.
+- `index.html` → `src/main.tsx` → `src/app/App.tsx` → 7 flat section components (home landing page). Only interactivity: smooth scroll between anchor sections and one accordion in `Contents.tsx`.
+- `errata.html` → `src/errata/main.tsx` → `src/errata/ErrataApp.tsx` + `ErrataForm.tsx` (dedicated errata page; form POSTs JSON to `errata.php`).
+
+The errata page intentionally uses its own minimal chrome (simple top bar + footer) rather than importing `Header`/`Footer` from `src/app/components/`. Those share `scrollToSection` logic that would misbehave as cross-page anchors; duplicating ~30 lines of markup is cheaper than refactoring them for two pages. When adding a third page, reconsider.
+
+Each home section is a self-contained file in `src/app/components/` (`Header`, `Hero`, `About`, `Contents`, `Author`, `Download`, `Footer`) with hardcoded Italian copy. `ImageWithFallback` (under `components/figma/`) is a legacy helper from Figma Make, preserved for the two remote Unsplash images in `About` and `Author`.
 
 The cover image at `src/imports/cover_fondamenti_ebook.svg` is **generated output** of the LaTeX book's latexmk recipe (`D:\LaTeX\Matematica_per_Informatica\latexmk\pdflatex_cover_ebook.latexmkrc`) — don't hand-edit. Rebuilding the cover in the LaTeX project auto-copies the SVG back into this directory.
 
@@ -67,12 +70,15 @@ No `tailwind.config.js`. Tailwind 4 is wired via `@tailwindcss/vite`, and config
 
 ## Deployment-related files in public/
 
-- `public/.htaccess` — SPA fallback + compression + cache headers for Apache (Aruba is Apache). Copied verbatim into `dist/` by Vite.
+- `public/.htaccess` — SPA fallback + compression + cache headers for Apache (Aruba is Apache). Copied verbatim into `dist/` by Vite. The SPA fallback rewrites only to `index.html` and only when the request doesn't match an existing file/dir, so `errata.html` and `errata.php` are served as-is without interference.
 - `public/robots.txt` — sitemap URL points to `matematica.lornova.it` (the iframe URL, not the underlying `www.loz.it`).
+- `public/errata.php` — PHP backend for the errata form. Runs on the same `loz.it` webspace as the SPA (temporary consolidation until multi-domain hosting). Self-contained: no Composer, no PHPMailer — single-file implementation of stateless HMAC captcha, honeypot + time-check + IP-hashed rate limit, and a minimal SMTP client speaking directly to `smtpauth.aruba.it:465`.
+- `public/errata.config.example.php` — committed template. Real values go in `errata.config.local.php` (gitignored), which **must be uploaded manually via SFTP** (WinSCP) next to `errata.php`. The CI deploy does not touch it — `SamKirkland/FTP-Deploy-Action` syncs only what's in `dist/`, and the config file isn't there.
+- `.errata-data/` — created at runtime by `errata.php` to store the rate-limit JSON. A `.htaccess` with `Require all denied` is written inside on creation, blocking HTTP access.
 
 ## Content conventions
 
 - **Copy is in Italian**, matching the book. Orthographic correctness matters (accents, no em-dash, decimal point, Italian double quotes).
 - **Don't invent facts about the book.** Page counts, exercise counts, release dates etc. must reflect the real state of the LaTeX project (`D:\LaTeX\Matematica_per_Informatica\`) — when in doubt, check `PIANO.md` / `CLAUDE.md` there, or ask. AI-generated placeholder content is what this codebase was cleaned up to remove.
-- **No personal email addresses in code** (neither as visible text nor as `mailto:`) — public contact goes only through LinkedIn/GitHub to avoid harvester spam.
+- **No email addresses in the client bundle** (neither as visible text, `mailto:`, nor as JS string constants) — the public-facing React code must stay clean to avoid harvester spam. Server-side PHP (in `public/errata.php` and its config) is exempt: those addresses never reach the browser. Public contact channels in visible HTML remain LinkedIn/GitHub only.
 - Amazon ASIN in `Download.tsx` is a placeholder constant (`AMAZON_URL`) — swap when the book is actually listed.

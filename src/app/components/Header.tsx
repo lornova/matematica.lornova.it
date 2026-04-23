@@ -34,9 +34,9 @@ export function Header() {
             <button onClick={() => scrollToSection('author')} className="hover:text-[#E86A10] transition-colors">
               Autore
             </button>
-            <button onClick={() => scrollToSection('errata')} className="hover:text-[#E86A10] transition-colors">
+            <a href="./errata.html" className="hover:text-[#E86A10] transition-colors">
               Errata
-            </button>
+            </a>
             <a
               href="https://www.lornova.it"
               target="_top"
@@ -86,12 +86,12 @@ export function Header() {
             >
               Autore
             </button>
-            <button
-              onClick={() => scrollToSection('errata')}
+            <a
+              href="./errata.html"
               className="block w-full text-left hover:text-[#E86A10] transition-colors"
             >
               Errata
-            </button>
+            </a>
             <a
               href="https://www.lornova.it"
               target="_top"

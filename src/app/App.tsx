@@ -4,7 +4,6 @@ import { About } from './components/About';
 import { Contents } from './components/Contents';
 import { Author } from './components/Author';
 import { Download } from './components/Download';
-import { Errata } from './components/Errata';
 import { Footer } from './components/Footer';
 
 export default function App() {
@@ -17,7 +16,6 @@ export default function App() {
         <Contents />
         <Author />
         <Download />
-        <Errata />
       </main>
       <Footer />
     </div>

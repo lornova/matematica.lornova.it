@@ -46,7 +46,7 @@ export function Footer() {
                 <a href="#download" className="hover:text-[#E86A10] transition-colors">Acquista</a>
               </li>
               <li>
-                <a href="#errata" className="hover:text-[#E86A10] transition-colors">Errata</a>
+                <a href="./errata.html" className="hover:text-[#E86A10] transition-colors">Errata</a>
               </li>
             </ul>
           </div>

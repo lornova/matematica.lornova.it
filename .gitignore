@@ -7,3 +7,6 @@ dist-ssr
 Thumbs.db
 winscp.log
 .claude/settings.local.json
+
+# Config PHP con credenziali SMTP: mai committato, caricato manualmente via SFTP.
+public/errata.config.local.php
