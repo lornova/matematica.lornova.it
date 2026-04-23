@@ -4,8 +4,10 @@ name: Preview deploy (GitHub Pages)
 # diverso da main. Il deploy di produzione verso Aruba resta gestito da
 # deploy.yml e si attiva solo su main.
 #
-# Pages viene abilitato automaticamente al primo run (enablement: true su
-# configure-pages). Setup manuale non richiesto.
+# Setup una tantum (richiesto dalla prima volta):
+#   repo Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# Il GITHUB_TOKEN dei workflow non ha il permesso 'administration' necessario
+# per abilitare Pages via API, quindi il passo e' manuale.
 #
 # L'URL della preview viene pubblicato nel summary del run e nell'environment
 # "github-pages". Ogni push sovrascrive la preview precedente (un solo slot).
@@ -71,8 +73,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
